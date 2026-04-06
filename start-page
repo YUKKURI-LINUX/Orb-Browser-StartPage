@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>新規タブ</title>
+    <script type="text/javascript" src="news.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Murecho:wght@300&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white; 
+            overflow: hidden; 
+            position: relative;
+            font-family: Murecho !important;
+            z-index: -2;
+        }
+.top-clock {
+    position: fixed;
+    top: 15px;
+    left: 20px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    color: white;
+    z-index: 10;
+    font-family: 'Murecho', sans-serif;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.clock-date {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+
+.clock-time {
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+        .fade-carousel {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100vh;
+          z-index: -1;
+          overflow: hidden;
+        }
+
+        .fade-item {
+          position: absolute;
+          top: 0;
+          left: 0;
+          margin:0;
+          padding:0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0;
+          transition: opacity 1.5s ease-in-out;
+          z-index: 0;
+        }
+
+        .fade-item.active {
+          opacity: 1;
+          z-index: 1;
+        }
+        a {
+            color:white;
+            text-decoration: none;
+        }
+        
+  
+        .top-links {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+        .top-links a {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #container {
+            top: 30%;
+            left: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+        
+
+        .searchBox-wrapper {
+            position: relative; 
+            width: 500px;
+        }
+        .searchBox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid white;
+            border-radius: 50px;
+            padding: 6px 15px;
+            font-size: 16px;
+            background-color: white;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #searchBox {
+            flex: 1;
+            height: 25px;
+            border: none;
+            font-size: 16px;
+            color: black;
+        }
+        #searchBox:focus {
+            outline: none;
+        }
+        #searchButton {
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        #suggest-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            z-index: 2000;
+            margin-top: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .suggest-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: #000;
+        }
+        .suggest-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .suggest-header {
+            padding: 8px 15px;
+            font-size: 12px;
+            color: #333;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .content-area {
+            position: absolute;
+            top: 52%;
+            left: 5%;
+            right: 5%;
+            bottom: 40px;
+            display: flex;
+            gap: 20px;
+            z-index: -1;
+        }
+        
+        .news {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+        #news-container {
+            flex: 1;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .news-article {
+            margin-bottom: 10px;
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .news-article h2 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+        .news-article p {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .weather {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            
+        }
+        #weather-box {
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.5);
+            text-align: center;
+            text-align: center;
+            height: 100%;
+           overflow-y: auto;
+        }
+        #weather-info {
+            font-size: 14px;
+            margin-bottom: 15px;
+            margin-top: 15px;
+        }
+
+        .popup-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease forwards;
+            z-index:1000;
+        }
+        .popup {
+            background-color: #333;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80%;
+            padding: 0;
+            animation: slideUp 0.3s ease forwards;
+            overflow: hidden;
+            z-index:1000;
+            color: white;
+        }
+        .popup-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            position: relative;
+        }
+        .popup-header h2 {
+            margin: 0;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+        }
+        .popup-header button {
+            position: absolute !important;
+            right: 18px !important;
+            background-color: transparent !important;
+            border: none !important;
+            color: #007bff !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 0;
+            width: 100%;
+        }
+        .popup-content {
+            margin: 0;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 300px;
+            font-size: 12px;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+  
+        #settingsModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 25px;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            z-index: 1000;
+            color: white;
+            width: 400px;
+        }
+        #settingsModal h2, #settingsModal h3 {
+            margin-top: 0;
+            color: white;
+        }
+        #settingsModal h3 {
+            font-size: 14px;
+            margin-top: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 5px;
+        }
+        #settingsModal p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 500;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .close-btn {
+            display: block;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        #engineSelect {
+            height: 30px;
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 5px;
+            font-size: 14px;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0 5px;
+            cursor: pointer;
+        }
+        #engineSelect option {
+            background-color: #222;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="fade-carousel">
+      <img src="images/landscape_01.jpg" class="fade-item active">
+      <img src="images/landscape_02.jpg" class="fade-item">
+      <img src="images/landscape_03.jpg" class="fade-item">
+      <img src="images/landscape_04.jpg" class="fade-item">
+      <img src="images/landscape_05.jpg" class="fade-item">
+      <img src="images/landscape_06.jpg" class="fade-item">
+      <img src="images/landscape_07.jpg" class="fade-item">
+      <img src="images/landscape_08.jpg" class="fade-item">
+      <img src="images/landscape_09.jpg" class="fade-item">
+      <img src="images/landscape_010.jpg" class="fade-item">
+      <img src="images/landscape_011.jpg" class="fade-item">
+      <img src="images/landscape_012.jpg" class="fade-item">
+      <img src="images/landscape_013.jpg" class="fade-item">
+      <img src="images/landscape_014.jpg" class="fade-item">
+    </div>
+    <div class="fade-carousel" style="background-color: rgba(0,0,0,0.4);"></div>
+    
+    <div class="top-links">
+      <div id="digital-clock" class="top-clock"></div>
+        <a href="#" id="license">利用規約</a>
+        <a href="#" id="settings">設定</a>
+    </div>
+    
+    <div id="settingsModal">
+      <h2 style="font-size: 18px; margin-bottom: 10px;">スタートページ設定</h2>
+      <h3>検索エンジン</h3>
+      <div style="display:flex; align-items: center; justify-content: space-between;"> 
+        <span style="font-size:13px;">デフォルト検索:</span>
+        <select id="engineSelect" onchange="onSearchEngineChange(this)">
+            <option value="https://www.google.com/search?q=">Google</option>
+            <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+            <option value="https://www.bing.com/search?q=">Bing</option>
+            <option value="https://search.yahoo.co.jp/search?p=">Yahoo</option>
+            <option value="https://www.baidu.com/s?wd=">百度</option>
+            <option value="https://www.yandex.com/search/?text=">Yandex</option>
+            <option value="https://www.ecosia.org/search?q=">Ecosia</option>
+            <option value="https://www.startpage.com/do/dsearch?query=">Startpage</option>
+        </select>
+      </div>
+      <h3>OrbBrowserについて</h3>
+      <img src="logo.png" alt="logo" width="120px" style="margin: 10px 0;">
+      <p style="font-size:11px; margin: 2px 0;">開発者:takarin氏(~V5.0), YUKKURILinuxDeveloperTeam(V5.x~)</p>
+      <p style="font-size:10px; opacity:0.6;">Copyright © 2022-2026 TeamYK, OrbBrowser.</p>
+      <a href="#" class="close-btn" id="closeModal">閉じる</a>
+    </div>
+
+    <div id="overlay"></div>
+    
+    <div id="popupBackground" class="popup-background">
+        <div id="popup" class="popup">
+            <div class="popup-header">
+                <h2>ソフトウェア利用規約</h2>
+                <button id="closePopup">同意</button>
+            </div>
+            <hr>
+            <div class="popup-content">
+                <h2 style="text-align:center; font-size:16px;">OrbBrowser利用規約</h2>
+                <br>
+                本利用規約はOrbBrowserを利用するにあたり、ユーザが以下に定める規約に拘束されることを同意したものとみなします。本規約に同意されない場合は、本ソフトの利用を中止しなければなりません。
+                <br><br>            
+                <h3>一条　本ソフトでの禁止事項</h3>
+                1.犯罪行為 / 2.サービスの運営を妨げる行為 / 3.なりすまし行為 / 4.侮辱的発言 / 5.露骨な性的表現 / 6.差別行為 / 7.自殺、自傷行為、薬物乱用を誘惑する行為 / 8.性行為やわいせつな行為を目的とする利用 / 9.宗教活動、宗教団体への誘惑行為 / 10.不適切行為 / 11.暴力的行為 / 12.不快感を与える利用行為
+                <br><br>
+                <h3>二条　本ソフトにおけるプライバシーについて</h3>
+                本ソフトでは、ユーザーが検索した情報、クレジットカード情報、アカウント情報を保存・流出することはありません。
+                <br><br>
+                <h3>三条　本ソフトの著作権について</h3>
+                ソフトウェア著作権:MIT License / スタートページの背景:CC BY-NC-ND 4.0
+            </div>
+            <hr>
+        </div>
+    </div>
+
+    <div id="locationPopup" class="popup-background">
+        <div class="popup" style="max-width: 400px;">
+            <div class="popup-header">
+                <h2>地域の設定</h2>
+                <button id="closeLocationPopup">閉じる</button>
+            </div>
+            <hr>
+            <div class="popup-content" style="text-align: center;">
+                <p style="margin-bottom: 15px; font-size:13px;">天気を表示する都市名を英語、または日本語で入力してください。</p>
+                <div style="display: flex; gap: 5px; justify-content: center; margin-bottom: 15px;">
+                    <input type="text" id="city-input" placeholder="例: Tokyo" style="padding: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.4); width: 60%; background: rgba(255,255,255,0.1); color: white;">
+                    <button id="search-btn" style="padding: 8px 15px; border-radius: 5px; border: none; background: #007bff; color: white; cursor: pointer;">検索</button>
+                </div>
+                <button id="reset-btn" style="padding: 8px 15px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; cursor: pointer; width: 80%;">現在地に戻す (自動判定)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="container">
+        <img src="logo.png" alt="logo" width="250px" class="applogo">
+        <div class="searchBox-wrapper">
+            <div class="searchBox">
+                <input type="text" id="searchBox" placeholder="検索..." autocomplete="off" />
+                <button id="searchButton"><img src="search.png" style="width:22px; height:auto;"></button>
+            </div>
+            <div id="suggest-box"></div>
+        </div>
+    </div>
+
+    <div class="content-area">
+        <div class="news">
+            <div class="section-title">最新のニュース</div>
+            <div id="news-container"><a id="error"></a></div>
+        </div>
+
+        <div class="weather">
+            <div class="section-title">天気</div>
+            <div id="weather-box">
+                <div id="weather-info">天気を読み込み中...</div>
+<div style="display: flex; align-items: center; justify-content: center; margin-top: 15px;">
+                    <button id="open-location-popup" onclick="showModal('locationModal')" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; border-radius: 15px; padding: 6px 15px; cursor: pointer; font-size: 12px; backdrop-filter: blur(5px); display: flex; align-items: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#F3F3F3" style="margin-right: 5px;">
+                            <path d="M536.5-503.5Q560-527 560-560t-23.5-56.5Q513-640 480-640t-56.5 23.5Q400-593 400-560t23.5 56.5Q447-480 480-480t56.5-23.5ZM480-186q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z"></path>
+                        </svg>場所を変更
+                    </button>
+                </div>
+        </div>
+    </div>
+
+    <script>
+      // スライドショー
+      document.addEventListener("DOMContentLoaded", () => {
+        const items = document.querySelectorAll(".fade-item");
+        let index = 0;
+        setInterval(() => {
+          items[index].classList.remove("active");
+          index = (index + 1) % items.length;
+          items[index].classList.add("active");
+        }, 60000);
+      });
+
+      // 検索、サジェスト、履歴機能
+      document.addEventListener("DOMContentLoaded", () => {
+        const searchBox = document.getElementById('searchBox');
+        const searchButton = document.getElementById('searchButton');
+        const engineSelect = document.getElementById('engineSelect');
+        const suggestBox = document.getElementById('suggest-box');
+
+        // デフォルト検索エンジンをキャッシュから復元
+        const savedEngine = localStorage.getItem('defaultSearchEngine');
+        if (savedEngine) {
+            engineSelect.value = savedEngine;
+        }
+     
+        // 検索実行 ＆ 履歴のキャッシュ保存
+        function performSearch() {
+          const searchEngine = engineSelect.value;
+          const query = searchBox.value.trim();
+          if (query) {
+             // 履歴に保存
+             saveSearchHistory(query);
+             window.open(searchEngine + encodeURIComponent(query), '_self');
+          }
+        }
+
+        function saveSearchHistory(query) {
+            let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            // 重複を削除して先頭に追加
+            history = history.filter(item => item !== query);
+            history.unshift(query);
+            // 最大5件に制限
+            history = history.slice(0, 5);
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+        }
+
+        // 検索履歴を表示
+        function showHistory() {
+            const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            suggestBox.innerHTML = '';
+            
+            if (history.length > 0) {
+                const header = document.createElement('div');
+                header.className = 'suggest-header';
+                header.innerText = '最近の検索履歴';
+                suggestBox.appendChild(header);
+
+                history.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'suggest-item';
+                    div.innerHTML = `🕒 ${item}`;
+                    div.onclick = () => {
+                        searchBox.value = item;
+                        performSearch();
+                    };
+                    suggestBox.appendChild(div);
+                });
+                suggestBox.style.display = 'block';
+            } else {
+                suggestBox.style.display = 'none';
+            }
+        }
+
+        searchBox.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(); });
+        searchButton.addEventListener('click', performSearch);
+
+        // JSONPによるサジェスト取得（CORSエラーを完全回避）
+        function getSuggestions(query) {
+            if (!query) {
+                showHistory();
+                return;
+            }
+            
+            const callbackName = 'jsonpCallback_' + Math.round(100000 * Math.random());
+            
+            window[callbackName] = function(data) {
+                const suggestions = data[1] || [];
+                suggestBox.innerHTML = '';
+                
+                if (suggestions.length > 0) {
+                    suggestions.slice(0, 5).forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'suggest-item';
+                        div.innerText = item;
+                        div.onclick = () => {
+                            searchBox.value = item;
+                            performSearch();
+                        };
+                        suggestBox.appendChild(div);
+                    });
+                    suggestBox.style.display = 'block';
+                } else {
+                    suggestBox.style.display = 'none';
+                }
+                delete window[callbackName];
+                document.getElementById(callbackName)?.remove();
+            };
+
+            const script = document.createElement('script');
+            script.id = callbackName;
+            script.src = `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(query)}&callback=${callbackName}`;
+            document.body.appendChild(script);
+        }
+
+        searchBox.addEventListener('input', (e) => getSuggestions(e.target.value));
+        
+        // フォーカス時、空なら履歴を出す
+        searchBox.addEventListener('focus', () => {
+            if (!searchBox.value.trim()) showHistory();
+        });
+
+        // 枠外をクリックしたらサジェストを閉じる
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.searchBox-wrapper')) {
+                suggestBox.style.display = 'none';
+            }
+        });
+      });
+
+      // ポップアップとモーダル関連
+      document.addEventListener("DOMContentLoaded", () => {
+        const popupBackground = document.getElementById('popupBackground');
+        const openPopupButton = document.getElementById('license');
+        const closePopupButton = document.getElementById('closePopup');
+        const settingsLink = document.getElementById("settings");
+        const settingsModal = document.getElementById("settingsModal");
+        const overlay = document.getElementById("overlay");
+        const closeModal = document.getElementById("closeModal");
+
+        if (openPopupButton) openPopupButton.addEventListener('click', () => popupBackground.style.display = 'flex');
+        if (closePopupButton) closePopupButton.addEventListener('click', () => popupBackground.style.display = 'none');
+        popupBackground.addEventListener('click', (e) => { if (e.target === popupBackground) popupBackground.style.display = 'none'; });
+        
+        if (settingsLink) {
+          settingsLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            settingsModal.style.display = "block";
+            overlay.style.display = "block";
+          });
+        }
+        function closeSettingsModal() {
+          settingsModal.style.display = "none";
+          overlay.style.display = "none";
+        }
+        if (closeModal) closeModal.addEventListener("click", closeSettingsModal);
+        if (overlay) overlay.addEventListener("click", closeSettingsModal);
+      });
+
+      // 天気機能
+      document.addEventListener("DOMContentLoaded", () => {
+          const OPENWEATHER_API_KEY = "3005d16753f47bee1c8482a9f110adba";
+          const IPINFO_TOKEN = "f672166df61396";
+
+          const savedLocation = localStorage.getItem("user_selected_location");
+          if (savedLocation) {
+              const { lat, lon, name } = JSON.parse(savedLocation);
+              getWeather(lat, lon, name);
+          } else {
+              getWeatherByIP();
+          }
+
+          const locationPopup = document.getElementById("locationPopup");
+          const openBtn = document.getElementById("open-location-popup");
+          const closeBtn = document.getElementById("closeLocationPopup");
+
+          if (openBtn) openBtn.addEventListener("click", () => locationPopup.style.display = "flex");
+          if (closeBtn) closeBtn.addEventListener("click", () => locationPopup.style.display = "none");
+          locationPopup.addEventListener("click", (e) => { if (e.target === locationPopup) locationPopup.style.display = "none"; });
+
+          document.getElementById("search-btn").addEventListener("click", searchCity);
+          document.getElementById("city-input").addEventListener("keypress", (e) => { if (e.key === 'Enter') searchCity(); });
+          document.getElementById("reset-btn").addEventListener("click", () => {
+              localStorage.removeItem("user_selected_location");
+              locationPopup.style.display = "none";
+              getWeatherByIP();
+          });
+
+          async function getWeatherByIP() {
+              try {
+                  const geoRes = await fetch(`https://ipinfo.io/json?token=${IPINFO_TOKEN}`);
+                  const geoData = await geoRes.json();
+                  const [lat, lon] = geoData.loc.split(',');
+                  getWeather(lat, lon, geoData.city || "現在地");
+              } catch (error) { console.error("IP取得失敗:", error); }
+          }
+
+          async function searchCity() {
+              const cityName = document.getElementById("city-input").value.trim();
+              if (!cityName) return;
+              try {
+                  const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${OPENWEATHER_API_KEY}`;
+                  const res = await fetch(geoUrl);
+                  const data = await res.json();
+                  if (data.length > 0) {
+                      const { lat, lon, name, local_names } = data[0];
+                      const displayName = local_names?.ja || name;
+                      localStorage.setItem("user_selected_location", JSON.stringify({ lat, lon, name: displayName }));
+                      getWeather(lat, lon, displayName);
+                      locationPopup.style.display = "none";
+                  } else { alert("都市が見つかりませんでした。"); }
+              } catch (error) { console.error("検索失敗:", error); }
+          }
+
+          async function getWeather(lat, lon, locationName) {
+              try {
+                  const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${OPENWEATHER_API_KEY}&lang=ja`);
+                  const weatherData = await weatherRes.json();
+                  
+                  const temperature = weatherData.main.temp;
+                  const weatherStateEng = weatherData.weather[0].main;
+                  const weatherStateJp = {
+                      "Clear": "晴れ", "Clouds": "曇り", "Rain": "雨", "Drizzle": "霧雨",
+                      "Thunderstorm": "雷雨", "Snow": "雪", "Mist": "霧", "Fog": "深い霧"
+                  }[weatherStateEng] || weatherData.weather[0].description;
+
+                  document.getElementById("weather-info").innerHTML = `
+                      <p style="font-weight:bold; margin-bottom:5px;">${locationName}</p>
+                      <p style="font-size: 20px; margin: 5px 0;">${weatherStateJp}</p>
+                      <p style="font-size: 16px; margin: 5px 0;">気温: ${temperature} ℃</p>
+                      <p style="font-size: 12px; opacity: 0.8; margin-top: 5px;">湿度: ${weatherData.main.humidity}%</p>
+                  `;
+              } catch (error) { console.error("天気取得失敗:", error); }
+          }
+      });
+    </script>
+
+    <script src="v2.js"></script>
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script type="text/javascript">
+        var bridge;
+        document.addEventListener("DOMContentLoaded", function() {
+            new QWebChannel(qt.webChannelTransport, function(channel) {
+                bridge = channel.objects.bridge;
+
+                bridge.getSearchEngine(function(engine) {
+                    var select = document.getElementById('engineSelect');
+                    if (select) select.value = engine;
+                });
+
+                bridge.searchEngineChanged.connect(function(engine) {
+                    var select = document.getElementById('engineSelect');
+                    if (select) select.value = engine;
+                });
+            });
+        });
+
+        // 検索エンジンのキャッシュ保存とPythonへの通知
+        function onSearchEngineChange(selectElement) {
+            localStorage.setItem('defaultSearchEngine', selectElement.value);
+            if (bridge) bridge.changeSearchEngine(selectElement.value);
+        }
+
+        function doSearch(query) {
+            if (bridge) bridge.search(query);
+        }
+    </script>
+</body>
+</html>
